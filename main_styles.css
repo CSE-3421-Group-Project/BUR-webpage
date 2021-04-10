@@ -58,3 +58,25 @@ button:hover {
   background-color: #606060;
   cursor: pointer;
 }
+
+.action-card {
+  margin: 1.5em;
+  max-width: 15em;
+  text-align: center;
+  border: 2px solid #202020;
+  border-radius: 1em;
+  transition: all 0.2s ease;
+}
+
+.action-card:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.action-card > h2 {
+  padding: 0.2em 0;
+  background-color: #202020;
+  color: white;
+  border-radius: 0.5em 0.5em 0 0;
+  border-bottom: 2px solid #202020;
+}

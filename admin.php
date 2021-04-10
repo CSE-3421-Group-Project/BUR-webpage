@@ -16,10 +16,6 @@
       return $conn;
     }
 
-    function closeDatabaseConnection($db) {
-      $db->close();
-    }
-
     function getDoses($batchId, $db) {
       $get_doses_query = "SELECT Tracking_no FROM Dose WHERE Dose.Batch_no = {$batchId}";
       $result = $db->query($get_doses_query);
@@ -74,7 +70,7 @@
       }
 
       // Close database connection
-      closeDatabaseConnection($db);
+      $db->close();
     }
 
     // TODO: For testing purposes. Feel free to delete.

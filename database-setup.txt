@@ -1,0 +1,37 @@
+create database BUR_webpage;
+use BUR_webpage;
+
+create table patient(
+Ssn int not null,
+Name varchar(100) not null,
+Age int not null,
+Priority int not null,
+Waitlist bool not null,
+Phone varchar(10) not null unique,
+Pref_date date not null,
+primary key (Ssn)
+);
+
+create table batch(
+Batch_no int not null auto_increment,
+Manufacturer varchar(50) not null,
+Exp_date date not null,
+primary key (Batch_no)
+);
+
+create table dose(
+    Tracking_no int not null auto_increment,
+    Batch_no int not null,
+    Status enum("expired", "available", "used", "reserved") not null,
+    primary key (Tracking_no),
+    foreign key (Batch_no) references batch(Batch_no)
+);
+
+create table appointment(
+    P_Ssn int not null,
+    Tracking_no int not null,
+    Date date not null,
+    primary key (P_Ssn, Tracking_no),
+    foreign key (P_Ssn) references patient(Ssn),
+    foreign key (Tracking_no) references dose(Tracking_no)
+);

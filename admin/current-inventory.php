@@ -12,7 +12,7 @@
 <?php
 function connectToDatabase() {
     // TODO: Is this database name correct?
-    $conn = new mysqli("localhost", "root", "mysql", "bur");
+    $conn = new mysqli("localhost", "bur", "bur", "BUR_webpage");
     if($conn->connect_error) die($conn->connect_error);
     if($conn === false) die("Error: Could not connect".mysqli_connect_error());
     return $conn;
@@ -27,9 +27,10 @@ function listCurrentInventory($db){
         group by b.Manufacturer, d.Status
 EOD;
     $result = $db->query($sql);
+    $inventory = array();
     while ($row = $result->fetch_array()){
-        inventory[ $row['manufacturer'] ][ $row['status'] ] = $row['doseCount'];
-        inventory[ $row['manufacturer'] ][ 'total' ] += $row['doseCount'];
+        $inventory[ $row['manufacturer'] ][ $row['status'] ] = $row['doseCount'];
+        $inventory[ $row['manufacturer'] ][ 'total' ] += $row['doseCount'];
 
     }
 ?>
@@ -46,13 +47,13 @@ EOD;
     </tr>
 
 <?php
-    foreach($inventory as $name => $inventory) {
+    foreach($inventory as $name => $count) {
         echo "<tr>";
         echo "<td>".$Name."</td>";
-        echo "<td>"$inventory['total'].."</td>";
-        echo "<td>".$inventory['used']."</td>";
-        echo "<td>".$inventory['expired']."</td>";
-        echo "<td>".$inventory['available']."</td>";
+        echo "<td>".$count['total']."</td>";
+        echo "<td>".$count['used']."</td>";
+        echo "<td>".$count['expired']."</td>";
+        echo "<td>".$count['available']."</td>";
         echo "</tr>";
     }
 }

@@ -21,6 +21,10 @@
           <h2>Add Batch</h2>
           <p>Add a batch of vaccine doses to the system and schedule waitlisted patients</p>
         </div>
+        <div class="action-card" onclick="redirect('admin/current-inventory.php')">
+          <h2>Inventory</h2>
+          <p>View the current vaccine inventory</p>
+        </div>
       </div>
     </div>
   </body>

@@ -4,6 +4,17 @@
     <title>List current vaccine inventory</title>
     <meta charset="UTF-8" />
     <link href="main_styles.css" type="text/css" rel="stylesheet" />
+    <style>
+        table {
+            cell-spacing: 20px;
+            border-collapse: collapse; 
+        }   
+        td, th {
+            text-align: center;
+            padding: 5px;
+            border: 1px solid black;
+        } 
+    </style>  
   </head>
   <body>
     <div class="main-content">
@@ -25,13 +36,20 @@ function listCurrentInventory($db){
         from DOSE as d, BATCH as b
         where d.Batch_no=b.Batch_no
         group by b.Manufacturer, d.Status
+        order by b.Manufacturer
 EOD;
     $result = $db->query($sql);
     $inventory = array();
     while ($row = $result->fetch_array()){
-        $inventory[ $row['manufacturer'] ][ $row['status'] ] = $row['doseCount'];
-        $inventory[ $row['manufacturer'] ][ 'total' ] += $row['doseCount'];
+        $manufacturer = $row['manufacturer'];
+        $status = $row['status'];
+        $count = isset($row['doseCount']) ? $row['doseCount'] : 0;
 
+        if( !isset($inventory[$manufacturer]) ){
+            $inventory[$manufacturer] = array();
+        }
+        $inventory[ $manufacturer ][ $status ] = $count;
+        $inventory[ $manufacturer ][ 'total' ] = array_key_exists('total' , $inventory[ $manufacturer ]) ? $inventory[ $manufacturer ]['total'] + $count : $count;
     }
 ?>
 
@@ -40,20 +58,28 @@ EOD;
     <table>
     <tr>
     <th>Manufacturer</th>
-    <th>Received</th>
-    <th>Distributed</th>
+    <th>Total Received</th>
+    <th>Total Distributed</th>
+    <th>Reserved</th>
     <th>Expired</th>
     <th>Available</th>
     </tr>
 
 <?php
     foreach($inventory as $name => $count) {
+        $total = isset($count['total']) ? $count['total'] : 0;
+        $used = isset($count['used']) ? $count['used'] : 0;
+        $reserved = isset($count['reserved']) ? $count['reserved'] : 0;
+        $expired = isset($count['expired']) ? $count['expired'] : 0;
+        $available = isset($count['available']) ? $count['available'] : 0;
+
         echo "<tr>";
-        echo "<td>".$Name."</td>";
-        echo "<td>".$count['total']."</td>";
-        echo "<td>".$count['used']."</td>";
-        echo "<td>".$count['expired']."</td>";
-        echo "<td>".$count['available']."</td>";
+        echo "<td>".$name."</td>";
+        echo "<td>".$total."</td>";
+        echo "<td>".$used."</td>";
+        echo "<td>".$reserved."</td>";
+        echo "<td>".$expired."</td>";
+        echo "<td>".$available."</td>";
         echo "</tr>";
     }
 }

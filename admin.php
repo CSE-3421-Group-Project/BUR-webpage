@@ -1,44 +1,27 @@
-<?php
-function listCurrentInventory($db){
-    $sql = <<<EOD
-        select COUNT(d.Tracking_no) as doseCount, d.Status as status, b.Manufacturer as manufacturer
-        from DOSE as d, BATCH as b
-        where d.Batch_no=b.Batch_no
-        group by b.Manufacturer, d.Status
-EOD;
-    $result = $db->query($sql);
-    while ($row = $result->fetch_array()){
-        inventory[ $row['manufacturer'] ][ $row['status'] ] = $row['doseCount'];
-        inventory[ $row['manufacturer'] ][ 'total' ] += $row['doseCount'];
-        
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BUR Admin Page</title>
+    <meta charset="UTF-8" />
+    <link href="main_styles.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript">
+    function redirect(newPath) {
+      window.location.href = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/${newPath}`;
     }
-?>
-
-    <div id="current_inventory">
-    <h3>Current vaccine inventory</h3>
-    <table>
-    <tr>
-    <th>Manufacturer</th>
-    <th>Received</th>
-    <th>Distributed</th>
-    <th>Expired</th>
-    <th>Available</th>
-    </tr>
-
-<?php
-    foreach($inventory as $name => $inventory) {
-        echo "<tr>";
-        echo "<td>".$Name."</td>";
-        echo "<td>"$inventory['total'].."</td>";
-        echo "<td>".$inventory['used']."</td>";
-        echo "<td>".$inventory['expired']."</td>";
-        echo "<td>".$inventory['available']."</td>";
-        echo "</tr>";
-    }
-?>
-    </table>
+    </script>
+  </head>
+  <body>
+    <nav>
+      <h1>BUR Admin Dashboard</h1>
+    </nav>
+    <div class="main-content">
+      <a href="index.php">Go back</a>
+      <div class="grid">
+        <div class="action-card" onclick="redirect('admin/add_batch.php')">
+          <h2>Add Batch</h2>
+          <p>Add a batch of vaccine doses to the system and schedule waitlisted patients</p>
+        </div>
+      </div>
     </div>
-
-<?php
-}
-?>
+  </body>
+</html>

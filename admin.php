@@ -21,6 +21,8 @@
           <h2>Add Batch</h2>
           <p>Add a batch of vaccine doses to the system and schedule waitlisted patients</p>
         </div>
+          <h2>List the vaccinated patients</h2>
+        </div>
       </div>
     </div>
   </body>

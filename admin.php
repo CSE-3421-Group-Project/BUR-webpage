@@ -21,7 +21,9 @@
           <h2>Add Batch</h2>
           <p>Add a batch of vaccine doses to the system and schedule waitlisted patients</p>
         </div>
-          <h2>List the vaccinated patients</h2>
+        <div class="action-card" onclick="redirect('admin/list-vaccinated.php')">
+          <h2>Vaccinated patients</h2>
+          <p>List the vaccinated patients</p>
         </div>
       </div>
     </div>

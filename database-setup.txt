@@ -35,3 +35,8 @@ create table appointment(
     foreign key (P_Ssn) references patient(Ssn),
     foreign key (Tracking_no) references dose(Tracking_no)
 );
+
+CREATE USER 'bur'@'localhost' IDENTIFIED BY 'bur';
+GRANT ALL PRIVILEGES ON * . * TO 'bur'@'localhost';
+FLUSH PRIVILEGES;
+ALTER USER 'bur'@'localhost' IDENTIFIED WITH mysql_native_password BY 'bur';

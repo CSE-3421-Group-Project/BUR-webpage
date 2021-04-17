@@ -6,6 +6,9 @@
         <link href="../main_styles.css" type="text/css" rel="stylesheet" />
     </head>
     <body>
+        <nav>
+            <h1>BUR Admin Dashboard</h1>
+        </nav>
         <div class="main-content">
             <a href="../admin.php">Go back</a>
             <h2>Scheduled Patients</h2>

@@ -3,7 +3,7 @@
   <head>
     <title>List current vaccine inventory</title>
     <meta charset="UTF-8" />
-    <link href="main_styles.css" type="text/css" rel="stylesheet" />
+    <link href="../main_styles.css" type="text/css" rel="stylesheet" />
     <style>
         table {
             cell-spacing: 20px;
@@ -17,6 +17,9 @@
     </style>  
   </head>
   <body>
+    <nav>
+      <h1>BUR Admin Dashboard</h1>
+    </nav>
     <div class="main-content">
       <a href="../admin.php">Go back</a>
 

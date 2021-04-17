@@ -4,17 +4,6 @@
         <title>List Waiting Patients</title>
         <meta charset="UTF-8" />
         <link href="../main_styles.css" type="text/css" rel="stylesheet" />
-    <style>
-        table {
-            cell-spacing: 20px;
-            border-collapse: collapse; 
-        }   
-        td, th {
-            text-align: center;
-            padding: 5px;
-            border: 1px solid black;
-        } 
-    </style>  
     </head>
     <body>
         <div class="main-content">

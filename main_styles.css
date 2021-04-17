@@ -132,3 +132,15 @@ input[type="submit"] {
   border-bottom: 0.3em solid #606060;
   color: #202020;
 }
+
+.error {
+  color: tomato;
+  font-weight: bold;
+  text-align: center;
+}
+
+.success {
+  color: seagreen;
+  font-weight: bold;
+  text-align: center;
+}

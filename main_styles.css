@@ -24,6 +24,16 @@ h2 {
   margin: 0;
 }
 
+table {
+  cell-spacing: 20px;
+  border-collapse: collapse; 
+}   
+td, th {
+  text-align: center;
+  padding: 5px;
+  border: 1px solid black;
+}
+
 .flex-box {
   display: flex;
   width: 100%;
@@ -80,3 +90,5 @@ button:hover {
   border-radius: 0.5em 0.5em 0 0;
   border-bottom: 2px solid #202020;
 }
+
+

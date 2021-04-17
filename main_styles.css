@@ -24,6 +24,17 @@ h2 {
   margin: 0;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  text-align: center;
+  padding: 5px;
+  border: 1px solid black;
+}
+
 .flex-box {
   display: flex;
   width: 100%;

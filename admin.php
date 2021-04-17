@@ -21,18 +21,22 @@
           <h2>Add Batch</h2>
           <p>Add a batch of vaccine doses to the system and schedule waitlisted patients</p>
         </div>
+        <div class="action-card" onclick="redirect('admin/list-vaccinated.php')">
+          <h2>Vaccinated patients</h2>
+          <p>List the vaccinated patients</p>
+        </div>
         <div class="action-card" onclick="redirect('admin/current-inventory.php')">
           <h2>Inventory</h2>
           <p>View the current vaccine inventory</p>
         </div>
-      </div>
-      <div class="action-card" onclick="redirect('admin/list_waiting.php')">
-        <h2>Waiting List</h2>
-        <p>Generate list of patients that are still waiting for the vaccine</p>
-      </div>
-      <div class="action-card" onclick="redirect('admin/list_scheduled.php')">
-        <h2>Scheduled List</h2>
-        <p>Generate list of patients that have scheduled for the vaccine</p>
+        <div class="action-card" onclick="redirect('admin/list_waiting.php')">
+          <h2>Waiting List</h2>
+          <p>Generate list of patients that are still waiting for the vaccine</p>
+        </div>
+        <div class="action-card" onclick="redirect('admin/list_scheduled.php')">
+          <h2>Scheduled List</h2>
+          <p>Generate list of patients that have scheduled for the vaccine</p>
+        </div>
       </div>
     </div>
   </body>

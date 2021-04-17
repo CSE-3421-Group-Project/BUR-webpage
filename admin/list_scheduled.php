@@ -3,7 +3,7 @@
     <head>
         <title>List Scheduled Patients</title>
         <meta charset="UTF-8" />
-        <link href="main_styles.css" type="text/css" rel="stylesheet" />
+        <link href="../main_styles.css" type="text/css" rel="stylesheet" />
     <style>
         table {
             cell-spacing: 20px;

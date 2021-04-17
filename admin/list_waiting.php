@@ -3,7 +3,7 @@
     <head>
         <title>List Waiting Patients</title>
         <meta charset="UTF-8" />
-        <link href="main_styles.css" type="text/css" rel="stylesheet" />
+        <link href="../main_styles.css" type="text/css" rel="stylesheet" />
     <style>
         table {
             cell-spacing: 20px;
@@ -39,8 +39,8 @@ function connectToDatabase() {
 
 function listWaiting($db){
     $sql = <<<EOD
-        select p.name as name, p.Priority as priority, p.Ssn as ssn, a.Date as date, b.Manufacturer as manufacturer
-        from PATIENT as p,
+        select p.name as name, p.Priority as priority, p.Ssn as ssn
+        from PATIENT as p
         where p.Waitlist = true
         order by p.Priority
 EOD;

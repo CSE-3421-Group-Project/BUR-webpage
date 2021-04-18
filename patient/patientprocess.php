@@ -8,7 +8,7 @@ $FirstName = $_POST['Fname'];
 $LastName = $_POST['Lname'];
 $PatientAge = $_POST['Age'];
 $PatientPhone = $_POST['Phone'];
-$PatientSSN = $_POST['SSN']
+$PatientSSN = $_POST['SSN'];
 $PatientPriority = $_POST['priority'];
 $EarliestDay = $_POST['Date'];
 /*

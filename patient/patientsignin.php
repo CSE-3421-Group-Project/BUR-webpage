@@ -11,8 +11,6 @@
     </script>
   </head>
 
-<?php
-print <<<_HTML_
 <h1> BUR Patient Sign-In </h1>
 <form action = PatientProcess.php method="post">
 		Enter Your First Name: <input type="text" name="Fname" placeholder = "First Name"><br><br><br>
@@ -22,12 +20,13 @@ print <<<_HTML_
 		SSN: <input type="text" name ="SSN" placeholder = "SSN"><br><br><br>
 		<br>
 	
-		<label for="PriorityList">Select a priority group: </label>
-		<select name="PriorityList" id="PriorityList">
-		<option value= "priority">Group 1</option>
-		<option value= "priority">Group 2</option>
-		<option value= "priority">Group 3</option>
+		<p> Select a priority group
+		<select name="priority">
+		<option value= '1'>Group 1</option>
+		<option value= '2'>Group 2</option>
+		<option value= '3'>Group 3</option>
 		</select>
+		</p>
 		<br><br><br>
 	    <input type="text" name="Date" placeholder = "Earliest Date"><br><br>
 		<input type="submit">

@@ -10,7 +10,6 @@
     </nav>
     <div class="main-content">
       <a href="index.php">Go back</a>
-      <a href="index.php">Go back</a>
       <div class ="grid">
         <div class = "action-card" onclick="redirect('patient/patientsignin.php')">
           <h2>Patient Sign-Up</h2>

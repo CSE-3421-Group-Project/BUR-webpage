@@ -15,7 +15,7 @@
           <h2>Patient Sign-Up</h2>
           <p>Sign-Up to receive the COVID vaccine </p>
         </div>
-        <div class = "action-card" onclick="redirect('patient/cancelAppt.php'">
+        <div class = "action-card" onclick="redirect('patient_info_remove.php')">
           <h2>Appointment Cancelation</h2>
           <p> Cancel a previously scheduled appointment </p>
         </div>

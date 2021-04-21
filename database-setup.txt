@@ -67,7 +67,8 @@ begin
     where d.Tracking_no = dose_tracking
 
     -- update dose
-    --dose_to_reallocate.Status = "available"
+    -- if dose_to_reallocate.Status = reserved
+        --dose_to_reallocate.Status = "available"
 
 -- delete appointment
     -- delete cancelled_apt

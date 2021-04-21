@@ -23,10 +23,9 @@
     </script>
   </head>
 	<body>
-
-		<h1> BUR Patient Sign-Up </h1>
+	<h1> BUR Patient Sign-Up </h1>
 			<div class="form-grid" id = "patientInfo">
-				<label>Enter Your Full Name: </label><input type="text" name="name"/>
+				<label>Enter Your Full Name: </label><input type="text" name="fullname" value = ""/>
 				<label>Age: </label><input type="number"  name="age"/>
 				<label>Phone: </label><input type="text" name="phone"/>
 				<label>SSN: </label><input type="number" name="ssn"/>
@@ -93,8 +92,11 @@ function connectToDatabase() {
 	if($conn === false) die("Error: Could not connect".mysqli_connect_error());
 	return $conn;
 }
-	$db = connectToDatabase();
-	$doseVal = 0;
+
+
+	
+
+	/*
 	if((isset($_POST['submit'])))
 	{
 		$PName = $db->real_escape_string($_POST['name']);
@@ -103,22 +105,33 @@ function connectToDatabase() {
 		$Ssn = $db->real_escape_string($_POST['ssn']);
 		$priority = $db->real_escape_string($_POST['priority']);
 		$date = $db->real_escape_string($_POST['pref_date']);
-	}
-		
-	$waitList = 0;
-	if(is_null($doseVal))
-	{
-		$waitList = 1;
-		echo 'Error here';
-	}
+	}*/
 
-	if($waitList == 1)
+	if(isset($_POST['submit']))
 	{
-		echo 'You have been added to the waitlist. We will contact you as appointments become available';
-	}
-	else{
+		echo "hi";
+		$Pname = $_POST['name'];
+		$PatientAge = $_POST['age'];
+		$Phone = $_POST['phone'];
+		$Ssn = $_POST['Ssn'];
+		$priority = $_POST['priority'];
+		$date = $_POST['date'];
+		$db = connectToDatabase();
+		$doseVal = 0;
+		$doseVal = findDose($date, $db);	
+		$waitList = 0;
+		if(is_null($doseVal))
+		{
+			$waitList = 1;
+			echo 'You have been added to the waitlist. We will contact you as appointments become available';
+			addPatient($db);
+		}
+		else{
+		  addPatient($db);
 			makeAppt($db, $doseVal, $date);
+		}
 	}
-  ?>
+	?>
+
 	</body>
 </html>

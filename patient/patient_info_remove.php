@@ -82,21 +82,25 @@
 
 
 
-      $db = connectToDatabase();
-      $patient = array('patient' -> array());
-	    $patient[$ssn] = array();
-      $date = date('m-d-Y');
-      $sql = "select Ssn from Patient, appointment where Ssn = '$patient[$ssn]' and '$date' > Date";
-        $result=$db->query($sql);
-        if($result->num_rows <= 0)
-        {
-          echo 'You were not found in our system or have already received the vaccine.';
-        }
-        else {
-          #Trigger handles appointment cancelation and making the dose available
-          scheduleWaitlisted($db);
-          deletePatient($db, $ssn);
-        }
+     
+      if(isset($_POST['submit']))
+	    {
+        $db = connectToDatabase();
+        $Ssn = $_POST['Ssn'];
+        $date = date('m-d-Y');
+        $sql = "select Ssn from Patient, appointment where Ssn = '$Ssn' and '$date' > Date";
+          $result=$db->query($sql);
+          if($result->num_rows == 0)
+          {
+            echo 'You were not found in our system or have already received the vaccine.';
+          }
+          else {
+            #Trigger handles appointment cancelation and making the dose available
+            scheduleWaitlisted($db);
+            deletePatient($db, $Ssn);
+          }
+      }
+     
 
 
 

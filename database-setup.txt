@@ -48,7 +48,7 @@ ALTER USER 'bur'@'localhost' IDENTIFIED WITH mysql_native_password BY 'bur';
 -- the web application needs to reallocate the dose to
 -- another patient right after this
 
-delimiter ;
+delimiter //
 create trigger reallocate_on_patient_cancellation
 before delete
 on patient for each row
@@ -62,5 +62,5 @@ begin
     and p.Ssn=pssn;
     delete from appointment where P_ssn = pssn;
 end
-
+//
 delimiter ;

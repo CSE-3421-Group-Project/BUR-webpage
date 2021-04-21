@@ -48,31 +48,19 @@ ALTER USER 'bur'@'localhost' IDENTIFIED WITH mysql_native_password BY 'bur';
 -- the web application needs to reallocate the dose to
 -- another patient right after this
 
+delimiter //
 create trigger reallocate_on_patient_cancellation
 before delete
 on patient for each row
 begin
--- dose goes from reserved to available
-    declare pssn int;
-    declare dose_tracking int;
-    set pssn = OLD.Ssn;
-
-    cancelled_apt = select * from appointment as a
-    where a.P_Ssn = pssn
-    -- find dose
-    set dose_tracking = a.Tracking_no
-
-    -- set dose to available
-    dose_to_reallocate = select * from dose as d
-    where d.Tracking_no = dose_tracking
-
-    -- update dose
-    -- if dose_to_reallocate.Status = reserved
-        --dose_to_reallocate.Status = "available"
-
--- delete appointment
-    -- delete cancelled_apt
-
-end;
-
-delimiter;
+	declare pssn integer default 111111111;
+	set pssn = OLD.Ssn;
+    update Dose as d, Appointment as a, Patient as p
+    set Status='available'
+    where a.Tracking_no=d.Tracking_no
+    and a.P_Ssn=p.Ssn
+    and p.Ssn=pssn;
+    delete from appointment where P_ssn = pssn;
+end
+//
+delimiter ;

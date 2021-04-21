@@ -25,7 +25,7 @@
 	<body>
 
 		<h1> BUR Patient Sign-Up </h1>
-			<div class="form-grid">
+			<div class="form-grid" id = "patientInfo">
 				<label>Enter Your Full Name: </label><input type="text" name="name"/>
 				<label>Age: </label><input type="number"  name="age"/>
 				<label>Phone: </label><input type="text" name="phone"/>
@@ -33,62 +33,55 @@
 				<label> Priority Group: </label><input type="number" name= "priority"/>
 				<label>Earliest Date to Take the Vaccine: </label><input type="date" name="pref_date"/>
 			</div>
-	  	<input type="submit">
+	  	<input type="submit" name = "submit">
 
 		</form>
 		<?php
-		$con=mysqli_connect('localhost', 'bur', 'bur', 'BUR-webpage');
-		if(!$con)
-		{
-			die('Cannot connect'.mysqli_connect_error());
-		}
-		$FullName = $_POST['name'];
-		$PatientAge = $_POST['age'];
-		$PatientPhone = $_POST['phone'];
-		$PatientSSN = $_POST['ssn'];
-		$PatientPriority = $_POST['priority'];
-		$DesiredDate = $_POST['pref_date'];
-
-
-
+	
 
 	function findDose($Pref_Date, $db) {
 		$availableDoseQuery = "select tracking_no from batch, dose where '$Pref_Date <= Exp_date and 
 		status = \"available\"";
 		$result=$db->query($availableDosesQuery);
-		$firstAvailable;
-		If ($result) {
-			If ($result->num_rows >0) 
-			{
-					$firstAvailable = $row['tracking_no'];
-			}
-	}
-}
+		$firstAvailableDose = "0";
+		if ($result) {
+		 if ($result->num_rows >0) 
+		 {
+						$firstAvailable = $row['tracking_no'];
+		 }
+		}
 		return $firstAvailable;
-
+	}
+	
 	function addPatient($db)
 	{
-		$PatientSQL = "Insert into patient (Ssn, Name, Age, Priority, Waitlist, Phone, Pref_Date)
-		values ('$PatientSSN', '$FullName', '$PatientAge', 
-		'$PatientPriority', '$waitList', '$PatientPhone' '$DesiredDate')";
+		$PatientSQL = "Insert into patient (Ssn, Name, Age, Priority, Waitlist, Phone, Pref_Date) 
+		 values ('$Ssn', '$PName', '$PatientAge', 
+		'$priority', '$waitlist', '$Phone' '$date')";
 		$result=$db->query($PatientSQL);
-		if(!$result) #Not sure about this.  Would anything be returned
+		if(!$result) 
 		{
 			echo 'Not inserted';
 		}
 	}
 	
-	function makeAppt($db, $dose)
+	function makeAppt($db, $dose, $DesiredDate)
 	{
 		$ApptSQL = "Insert into appointment (P_Ssn, Tracking_no, Date)
-		values ('$PatientSSN', '$dose', '$DesiredDate')";
+		values ('$Ssn]', '$dose', '$DesiredDate')";
 		$result=$db->query($ApptSQL);
-		if(!$result) #Not sure about this.  Would anything be returned
+		if(!$result) 
 		{
 			echo 'Not inserted';
 		}
 		else{
 			echo 'You have an appointment on ', $DesiredDate, '.  See you soon!';
+			$updateDose = "update dose set status = \"reserved\" where tracking_no = '$dose'";
+			$result=$db->query($ApptSQL);
+			if(!$result) 
+			{
+				echo 'Not updated';
+			}
 		} 
 	}
 		
@@ -102,24 +95,30 @@ function connectToDatabase() {
 }
 	$db = connectToDatabase();
 	$doseVal = 0;
-	$doseVal = findDose($DesiredDate);
-	$waitList = 0;
-	/*is_null($dose)
+	if((isset($_POST['submit'])))
 	{
-		#$waitList = 1;
+		$PName = $db->real_escape_string($_POST['name']);
+		$PatientAge = $db->real_escape_string($_POST['age']);
+		$Phone = $db->real_escape_string($_POST['phone']);
+		$Ssn = $db->real_escape_string($_POST['ssn']);
+		$priority = $db->real_escape_string($_POST['priority']);
+		$date = $db->real_escape_string($_POST['pref_date']);
+	}
+		
+	$waitList = 0;
+	if(is_null($doseVal))
+	{
+		$waitList = 1;
 		echo 'Error here';
-	}*/
+	}
 
-	If($waitList == 1)
+	if($waitList == 1)
 	{
 		echo 'You have been added to the waitlist. We will contact you as appointments become available';
 	}
 	else{
-			makeAppt($db, $doseVal);
+			makeAppt($db, $doseVal, $date);
 	}
-
-
-	
-		?>
+  ?>
 	</body>
 </html>

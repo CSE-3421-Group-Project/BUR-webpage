@@ -3,7 +3,7 @@
   <head>
     <title>BUR Admin Page</title>
     <meta charset="UTF-8" />
-    <link href="main_styles.css" type="text/css" rel="stylesheet" />
+    <link href="../main_styles.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
     <nav>
@@ -11,31 +11,46 @@
     </nav>
     <div class="main-content">
       <a href="../admin.php">Go back</a>
-      <h2>Add Batch to System</h2>
+      <h2 class="title">Add Batch to System</h2>
+      <hr class="form-divider" />
       <?php
       function connectToDatabase() {
-        // TODO: Is this database name correct?
-        $conn = new mysqli("localhost", "root", "mysql", "bur");
+        $conn = new mysqli("localhost", "bur", "bur", "bur_webpage");
         if($conn->connect_error) die($conn->connect_error);
         if($conn === false) die("Error: Could not connect".mysqli_connect_error());
         return $conn;
       }
 
       function getDoses($batchId, $db) {
-        $get_doses_query = "SELECT Tracking_no FROM Dose WHERE Dose.Batch_no = {$batchId}";
-        $result = $db->query($get_doses_query);
-        if(!$result) die($db->error);
-        if($result && $result->num_rows > 0) {
-          return $result;
+        try {
+          $get_doses_query = $db->prepare("SELECT Tracking_no FROM dose WHERE dose.Batch_no = ? and dose.Status = \"available\"");
+          if($get_doses_query) {
+            $get_doses_query->bind_param("i", $batchId);
+            $get_doses_query->execute();
+            $result = $get_doses_query->get_result();
+            if($result->num_rows > 0) {
+              return $result;
+            }
+          }
+        } catch (\Throwable $e) {
+          throw $e;
         }
         return null;
       }
 
-      function getWaitlistedPatientsByRow($num_of_patients, $db) {
-        $waitlisted_patients_query = "SELECT P_id, Earliest_date FROM patient WHERE Waitlisted = TRUE ORDER BY Priority LIMIT {$num_of_patients}";
-        $result = $db->query($waitlisted_patients_query);
-        if($result && $result->num_rows > 0) {
-          return $result;
+      function getWaitlistedPatientsByRow($num_of_patients, $expiration, $db) {
+        try {
+          $waitlisted_patients_query = $db->prepare("SELECT Ssn, Pref_date FROM patient WHERE Waitlist = TRUE and Pref_date < ? ORDER BY Priority, Age LIMIT ?");
+          if($waitlisted_patients_query) {
+            $waitlisted_patients_query->bind_param("si", $expiration, $num_of_patients);
+            $waitlisted_patients_query->execute();
+            $result = $waitlisted_patients_query->get_result();
+            if($result->num_rows > 0) {
+              return $result;
+            }
+          }
+        } catch (\Throwable $e) {
+          throw $e;
         }
         return null;
       }
@@ -43,44 +58,90 @@
       function createAppointment($pid, $tracking_no, $date, $db) {
         try {
           $db->begin_transaction();
-          $db->query("INSERT INTO appointment (P_id, Dose_no, Date) VALUES ({$pid}, {$tracking_no}, \"{$date}\")");
-          $db->query("UPDATE patient SET Waitlisted = FALSE WHERE P_id = {$pid}");
-          // TODO: Might need to reserve dose
+          $insert_appointment = $db->prepare("INSERT INTO appointment (P_Ssn, Tracking_no, Date) VALUES (?, ?, ?)");
+          $insert_appointment->bind_param("iis", $pid, $tracking_no, $date);
+          $insert_appointment->execute();
+
+          $update_waitlist = $db->prepare("UPDATE patient SET Waitlist = FALSE WHERE Ssn = ?");
+          $update_waitlist->bind_param("i", $pid);
+          $update_waitlist->execute();
+
+          $reserve_dose = $db->prepare("UPDATE dose SET Status = \"reserved\" WHERE Tracking_no = ?");
+          $reserve_dose->bind_param("i", $tracking_no);
+          $reserve_dose->execute();
+
           $db->commit();
-          // TODO: This is for testing. Please remove in final release.
-          echo "<div>Made appointment for {$pid} on {$date}</div>";
         } catch (\Throwable $e) {
           $db->rollback();
           throw $e;
         }
       }
 
-      function scheduleWaitlistedToBatch($batchId) {
-        // Open database connection
-        $db = connectToDatabase();
-
+      function scheduleWaitlistedToBatch($batchId, $expiration, $db) {
         // Get num of doses in batch
         $doses = getDoses($batchId, $db);
         if(!$doses) return;
 
         // Get patients on waitlist sorted by priority
-        $patients = getWaitlistedPatientsByRow($doses->num_rows, $db);
+        $patients = getWaitlistedPatientsByRow($doses->num_rows, $expiration, $db);
         if(!$patients) return;
 
         // Assign first x patients to a batch at their earliest date.
         while($patient = $patients->fetch_assoc()) {
           $dose = $doses->fetch_assoc();
-          // TODO: How should the date be chosen?
-          createAppointment($patient["P_id"], $dose["Tracking_no"], $patient["Earliest_date"], $db);
+          createAppointment($patient["Ssn"], $dose["Tracking_no"], $patient["Pref_date"], $db);
         }
-
-        // Close database connection
-        $db->close();
       }
 
-      // TODO: For testing purposes. Feel free to delete.
-      scheduleWaitlistedToBatch(1);
+      if(array_key_exists('manufacturer', $_POST) && $_POST['manufacturer']
+         && array_key_exists('expiration', $_POST) && $_POST['expiration']
+         && array_key_exists('numOfDoses', $_POST) && $_POST['numOfDoses']) {
+        $manufacturer = $_POST['manufacturer'];
+        $expiration = $_POST['expiration'];
+        $num_of_doses = $_POST['numOfDoses'];
+
+        // Check if the expiration is later than the current date.
+        if(new DateTime($expiration) > new DateTime()) {
+          $db = connectToDatabase();
+          $db->begin_transaction();
+
+          try {
+            $insert_batch = $db->prepare("INSERT INTO batch (Manufacturer, Exp_date) VALUES (?, ?)");
+            $insert_batch->bind_param("ss", $manufacturer, $expiration);
+            $insert_batch->execute();
+            $batch = $db->insert_id;
+
+            $insert_dose = $db->prepare("INSERT INTO dose (Batch_no, Status) VALUES (?, \"available\")");
+            $insert_dose->bind_param("i", $batch);
+            for($i = 0; $i < $num_of_doses; $i++) {
+              $insert_dose->execute();
+            }
+            
+            $db->commit();
+
+            scheduleWaitlistedToBatch($batch, $expiration, $db);
+          } catch (\Throwable $e) {
+            $db->rollback();
+            throw $e;
+          }
+
+          $db->close();
+
+          echo "<div class=\"success\">The batch was successfully added!</div>";
+        } else {
+          echo "<div class=\"error\">The batch you entered is already expired!</div>";
+        }
+      }
+      
+      echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">";
       ?>
+      <div class="form-grid">
+        <label>Manufacturer: </label><input type="text" name="manufacturer"/>
+        <label>Expiration Date: </label><input type="date" name="expiration"/>
+        <label>Number of doses: </label><input type="number" min="1" value="10" step="1" name="numOfDoses" />
+      </div>
+      <input type="submit" value="Submit" />
+      </form>
     </div>
   </body>
 </html>

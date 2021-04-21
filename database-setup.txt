@@ -52,27 +52,19 @@ create trigger reallocate_on_patient_cancellation
 before delete
 on patient for each row
 begin
--- dose goes from reserved to available
     declare pssn int;
-    declare dose_tracking int;
     set pssn = OLD.Ssn;
 
-    cancelled_apt = select * from appointment as a
-    where a.P_Ssn = pssn
-    -- find dose
-    set dose_tracking = a.Tracking_no
+    -- set dose to available.
+    update Dose as d, Appointment as a, Patient as p
+    where a.Tracking_no=d.Tracking_no
+    and a.P_Ssn=p.Ssn
+    and p.Ssn=pssn
+    set Status='available'
 
-    -- set dose to available
-    dose_to_reallocate = select * from dose as d
-    where d.Tracking_no = dose_tracking
+    -- delete appointment
+    delete from appointment where P_ssn = pssn;
 
-    -- update dose
-    -- if dose_to_reallocate.Status = reserved
-        --dose_to_reallocate.Status = "available"
-
--- delete appointment
-    -- delete cancelled_apt
-
-end;
+end$$
 
 delimiter;

@@ -93,19 +93,6 @@ function connectToDatabase() {
 }
 
 
-	
-
-	/*
-	if((isset($_POST['submit'])))
-	{
-		$PName = $db->real_escape_string($_POST['name']);
-		$PatientAge = $db->real_escape_string($_POST['age']);
-		$Phone = $db->real_escape_string($_POST['phone']);
-		$Ssn = $db->real_escape_string($_POST['ssn']);
-		$priority = $db->real_escape_string($_POST['priority']);
-		$date = $db->real_escape_string($_POST['pref_date']);
-	}*/
-
 	if(array_key_exists('fullname', $_POST) && $_POST['fullname'] && 
 		 array_key_exists('age', $_POST) && $_POST['age'] &&
 		 array_key_exists('phone', $_POST) && $_POST['phone'] &&

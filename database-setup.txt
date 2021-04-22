@@ -40,3 +40,27 @@ CREATE USER 'bur'@'localhost' IDENTIFIED BY 'bur';
 GRANT ALL PRIVILEGES ON * . * TO 'bur'@'localhost';
 FLUSH PRIVILEGES;
 ALTER USER 'bur'@'localhost' IDENTIFIED WITH mysql_native_password BY 'bur';
+
+-- this trigger is called before the patient relation is deleted
+-- the web application needs to delete the patient relation
+-- when the patient decides to cancel.
+-- additionally, all this does is make the dose available (and delete the appt)
+-- the web application needs to reallocate the dose to
+-- another patient right after this
+
+delimiter //
+create trigger reallocate_on_patient_cancellation
+before delete
+on patient for each row
+begin
+	declare pssn integer default 111111111;
+	set pssn = OLD.Ssn;
+    update Dose as d, Appointment as a, Patient as p
+    set Status='available'
+    where a.Tracking_no=d.Tracking_no
+    and a.P_Ssn=p.Ssn
+    and p.Ssn=pssn;
+    delete from appointment where P_ssn = pssn;
+end
+//
+delimiter ;

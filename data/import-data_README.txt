@@ -1,6 +1,6 @@
 I used this sql command to import the .csv files
 
-load data infile 'appointment.csv' 
+load data infile './data/appointment.csv' 
 into table appointment
 FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'

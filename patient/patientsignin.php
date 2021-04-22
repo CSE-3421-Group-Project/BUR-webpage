@@ -23,8 +23,11 @@
     </script>
   </head>
 	<body>
-	
-	<h1> BUR Patient Sign-Up </h1>
+		<nav>
+			<h1> BUR Patient Sign-Up </h1>
+		</nav>
+		<div class="main-content">
+		<a href="../patient.php">Go back</a>
 	<?php echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">"; ?>
 			<div class="form-grid">
 				<label>Enter Your Full Name: </label><input type="text" name="fullname" value = ""/>
@@ -40,8 +43,8 @@
 	
 
 	function findDose($Pref_Date, $db) {
-		$availableDoseQuery = "select Tracking_no from batch, dose where '$Pref_Date' <= Exp_date and 
-		status = \"available\"";
+		$availableDoseQuery = "select Tracking_no from batch, dose where batch.Batch_no = dose.Batch_no
+		and \"$Pref_Date\" <= Exp_date and status = \"available\"";
 		$result=$db->query($availableDoseQuery);
 		$firstAvailableDose = null;
 		if ($result && $result->num_rows > 0) {
@@ -120,6 +123,7 @@ function connectToDatabase() {
 		}
 	}
 	?>
+	</div>
 
 	</body>
 </html>

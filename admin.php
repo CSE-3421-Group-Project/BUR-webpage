@@ -37,6 +37,10 @@
           <h2>Scheduled List</h2>
           <p>Generate list of patients that have scheduled for the vaccine</p>
         </div>
+        <div class="action-card" onclick="redirect('admin/dose_status.php')">
+          <h2>Dose Statuses</h2>
+          <p>Generate list of doses and the patient assigned to them.</p>
+        </div>
       </div>
     </div>
   </body>

@@ -1,0 +1,25 @@
+
+--Scenario 1- There are no doses available
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+		 values (222333444, 'Laura Everly', 42, 
+		'2', '8076983456' '5-1-2021')";
+
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+		 values (123456778, 'Elizabeth Sparrow', 17, 
+		1, '6144563454' '4-20-2021')";
+
+--Scenario 2- Pfizer Batch is available
+insert into batch(Manufacturer, Exp_date) values ('Pfizer', '6-1-2021')
+insert into dose(Tracking_no, Status) values (101, "available")
+
+--Scenario 3- Moderna Batch is available
+insert into batch(Manufacturer, Exp_date) values ('Moderna', '4-25-2021')
+insert into dose(Tracking_no, Status) values (101, "available")
+insert into dose(Tracking_no, Status) values (101, "available")
+
+--Scenario 4 and 5 occur on the webpage
+
+--Scenario 6- One batch of Pfizer receieved
+insert into batch(Manufacturer, Exp_date) values ('Pfizer', '6-30-2021')
+insert into dose(Tracking_no, Status) values (103, "available")
+

@@ -40,7 +40,7 @@
 
       function getWaitlistedPatientsByRow($num_of_patients, $expiration, $db) {
         try {
-          $waitlisted_patients_query = $db->prepare("SELECT Ssn, Pref_date FROM patient WHERE Waitlist = TRUE and Pref_date < ? ORDER BY Priority, Age LIMIT ?");
+          $waitlisted_patients_query = $db->prepare("SELECT Ssn, Pref_date FROM patient WHERE Waitlist = TRUE and Pref_date < ? ORDER BY Priority, Age DESC LIMIT ?");
           if($waitlisted_patients_query) {
             $waitlisted_patients_query->bind_param("si", $expiration, $num_of_patients);
             $waitlisted_patients_query->execute();

@@ -23,6 +23,7 @@
   </head>
   <body>
     <h1> BUR Patient Information Removal Request </h1>
+    <?php echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">"; ?>
     <div class="form-grid">
       <label>Enter your SSN: </label><input type="number" name="ssn"/>
     </div>
@@ -50,7 +51,7 @@
       }
       
 
-      function scheduleWaitlisted($db)
+      function scheduleWaitlisted($db, $DesiredDate)
       {
         $findPatient = "select * from patient where 
         and waitlist = 1 order by age and group by priority";
@@ -60,43 +61,61 @@
           {
               $waitlistedPatient = $row['Ssn'];
               $dose = findAvailableDose($db);
-              $sqlAppt = "Insert into appointment (P_Ssn, Tracking_no, Date) values ('$waitlistedPatient', '$dose', '$DesiredDate')";
+              $sqlAppt = "Insert into appointment (P_Ssn, Tracking_no, Date) values ($waitlistedPatient, $dose, '$DesiredDate')";
 		          $result=$db->query($sqlAppt);
 		          if(!$result) 
 		          {
-			          echo 'Not inserted';
+			          echo $db->error;
 		          }
           }
         }
       }
 
+      function deleteAppt($db, $ssn)
+      {
+        $delAppt = "delete from appointment where P_Ssn = $ssn";
+        $result=$db->query($delAppt);
+        if(!$result)
+        {
+          echo $db->error;
+        }
+      }
+
       function deletePatient($db, $ssn)
       {
-        $delPatient = "delete from patient where Ssn = '$ssn'";
+        $delPatient = "delete from patient where Ssn = $ssn";
         $result=$db->query($delPatient);
         if(!$result)
         {
-          echo 'Not deleted';
+          echo $db->error;
         }
       }
 
 
 
      
-      if(isset($_POST['submit']))
-	    {
+      if(array_key_exists('ssn', $_POST) && $_POST['ssn'])
+      {
         $db = connectToDatabase();
-        $Ssn = $_POST['Ssn'];
+        $Ssn = $_POST['ssn'];
         $date = date('m-d-Y');
-        $sql = "select Ssn from Patient, appointment where Ssn = '$Ssn' and '$date' > Date";
+        $sql = "select p.Ssn, p.Pref_date from Patient as p, appointment as a, dose as d
+        where a.P_Ssn = $Ssn and p.Ssn = $Ssn and a.Tracking_no = d.Tracking_no and d.status = \"reserved\"";
           $result=$db->query($sql);
-          if($result->num_rows == 0)
+          if($result && $result->num_rows == 0)
           {
             echo 'You were not found in our system or have already received the vaccine.';
           }
           else {
             #Trigger handles appointment cancelation and making the dose available
-            scheduleWaitlisted($db);
+            
+		
+            $patient = $result->fetch_assoc();
+            $Ssn = $patient['Ssn'];
+            $DesiredDate = $patient['Pref_date'];
+        
+            scheduleWaitlisted($db, $DesiredDate);
+            deleteAppt($db, $Ssn);
             deletePatient($db, $Ssn);
           }
       }

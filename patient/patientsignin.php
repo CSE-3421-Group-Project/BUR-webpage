@@ -23,8 +23,10 @@
     </script>
   </head>
 	<body>
+	
 	<h1> BUR Patient Sign-Up </h1>
-			<div class="form-grid" id = "patientInfo">
+	<?php echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">"; ?>
+			<div class="form-grid">
 				<label>Enter Your Full Name: </label><input type="text" name="fullname" value = ""/>
 				<label>Age: </label><input type="number"  name="age"/>
 				<label>Phone: </label><input type="text" name="phone"/>
@@ -33,53 +35,50 @@
 				<label>Earliest Date to Take the Vaccine: </label><input type="date" name="pref_date"/>
 			</div>
 	  	<input type="submit" name = "submit">
-
 		</form>
 		<?php
 	
 
 	function findDose($Pref_Date, $db) {
-		$availableDoseQuery = "select tracking_no from batch, dose where '$Pref_Date <= Exp_date and 
+		$availableDoseQuery = "select Tracking_no from batch, dose where '$Pref_Date' <= Exp_date and 
 		status = \"available\"";
-		$result=$db->query($availableDosesQuery);
-		$firstAvailableDose = "0";
-		if ($result) {
-		 if ($result->num_rows >0) 
-		 {
-						$firstAvailable = $row['tracking_no'];
-		 }
+		$result=$db->query($availableDoseQuery);
+		$firstAvailableDose = null;
+		if ($result && $result->num_rows > 0) {
+		
+					$firstAvailableDose = $result->fetch_assoc()['Tracking_no'];
 		}
-		return $firstAvailable;
+		return $firstAvailableDose;
 	}
 	
-	function addPatient($db)
+	function addPatient($db, $Ssn, $PName, $PatientAge, $priority, $waitlist, $Phone, $date)
 	{
 		$PatientSQL = "Insert into patient (Ssn, Name, Age, Priority, Waitlist, Phone, Pref_Date) 
-		 values ('$Ssn', '$PName', '$PatientAge', 
-		'$priority', '$waitlist', '$Phone' '$date')";
+		 values ($Ssn, '$PName', $PatientAge, 
+		$priority, $waitlist, '$Phone', '$date')";
 		$result=$db->query($PatientSQL);
 		if(!$result) 
 		{
-			echo 'Not inserted';
+			echo $db->error;
 		}
 	}
 	
-	function makeAppt($db, $dose, $DesiredDate)
+	function makeAppt($db, $dose, $DesiredDate, $Ssn)
 	{
 		$ApptSQL = "Insert into appointment (P_Ssn, Tracking_no, Date)
-		values ('$Ssn]', '$dose', '$DesiredDate')";
+		values ($Ssn, $dose, '$DesiredDate')";
 		$result=$db->query($ApptSQL);
 		if(!$result) 
 		{
-			echo 'Not inserted';
+			echo $db->error;
 		}
 		else{
 			echo 'You have an appointment on ', $DesiredDate, '.  See you soon!';
-			$updateDose = "update dose set status = \"reserved\" where tracking_no = '$dose'";
-			$result=$db->query($ApptSQL);
+			$updateDose = "update dose set status = \"reserved\" where tracking_no = $dose";
+			$result=$db->query($updateDose);
 			if(!$result) 
 			{
-				echo 'Not updated';
+				echo $db->error;
 			}
 		} 
 	}
@@ -107,28 +106,30 @@ function connectToDatabase() {
 		$date = $db->real_escape_string($_POST['pref_date']);
 	}*/
 
-	if(isset($_POST['submit']))
+	if(array_key_exists('fullname', $_POST) && $_POST['fullname'] && 
+		 array_key_exists('age', $_POST) && $_POST['age'] &&
+		 array_key_exists('phone', $_POST) && $_POST['phone'] &&
+		 array_key_exists('ssn', $_POST) && $_POST['ssn'] &&
+		 array_key_exists('priority', $_POST) && $_POST['priority'] &&
+		 array_key_exists('pref_date', $_POST) && $_POST['pref_date'])
 	{
-		echo "hi";
-		$Pname = $_POST['name'];
+		$Pname = $_POST['fullname'];
 		$PatientAge = $_POST['age'];
 		$Phone = $_POST['phone'];
-		$Ssn = $_POST['Ssn'];
+		$Ssn = $_POST['ssn'];
 		$priority = $_POST['priority'];
-		$date = $_POST['date'];
+		$date = $_POST['pref_date'];
 		$db = connectToDatabase();
 		$doseVal = 0;
 		$doseVal = findDose($date, $db);	
-		$waitList = 0;
-		if(is_null($doseVal))
+		$waitList = is_null($doseVal) ? 1:0;
+		addPatient($db, $Ssn, $Pname, $PatientAge, $priority, $waitList, $Phone, $date);
+		if($waitList == 1)
 		{
-			$waitList = 1;
 			echo 'You have been added to the waitlist. We will contact you as appointments become available';
-			addPatient($db);
 		}
 		else{
-		  addPatient($db);
-			makeAppt($db, $doseVal, $date);
+			makeAppt($db, $doseVal, $date, $Ssn);
 		}
 	}
 	?>

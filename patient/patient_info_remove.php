@@ -22,19 +22,18 @@
     </script>
   </head>
   <body>
-    <h1> BUR Patient Information Removal Request </h1>
-    <?php echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">"; ?>
-    <div class="form-grid">
-      <label>Enter your SSN: </label><input type="number" name="ssn"/>
-    </div>
-    <input type="submit">
-    <?php
+    <nav>
+      <h1> BUR Patient Information Removal Request </h1>
+    </nav>
+    <div class="main-content">
+      <a href="../patient.php">Go back</a>
+      <?php
 
       function connectToDatabase() {
-	    $conn = new mysqli("localhost", "bur", "bur", "bur_webpage");
-	    if($conn->connect_error) die($conn->connect_error);
-	    if($conn === false) die("Error: Could not connect".mysqli_connect_error());
-      return $conn;
+        $conn = new mysqli("localhost", "bur", "bur", "bur_webpage");
+        if($conn->connect_error) die($conn->connect_error);
+        if($conn === false) die("Error: Could not connect".mysqli_connect_error());
+        return $conn;
       }
 
       function findAvailableDose($db)
@@ -49,7 +48,6 @@
         }
         return $selectedDose;
       }
-      
 
       function scheduleWaitlisted($db, $DesiredDate)
       {
@@ -71,16 +69,6 @@
         }
       }
 
-      function deleteAppt($db, $ssn)
-      {
-        $delAppt = "delete from appointment where P_Ssn = $ssn";
-        $result=$db->query($delAppt);
-        if(!$result)
-        {
-          echo $db->error;
-        }
-      }
-
       function deletePatient($db, $ssn)
       {
         $delPatient = "delete from patient where Ssn = $ssn";
@@ -91,21 +79,17 @@
         }
       }
 
-
-
-     
       if(array_key_exists('ssn', $_POST) && $_POST['ssn'])
       {
         $db = connectToDatabase();
         $Ssn = $_POST['ssn'];
-        $date = date('m-d-Y');
 
         $sql = "select waitlist from Patient where Ssn = '$Ssn'";
         $result=$db->query($sql);
         $waitlistVal = null;
         if($result && $result->num_rows > 0)
         {
-          $waitlistVal = $result->fetch_assoc()['Tracking_no'];
+          $waitlistVal = $result->fetch_assoc()['waitlist'];
         }
 
         if($waitlistVal == 1)
@@ -114,39 +98,35 @@
         }
         elseif($waitlistVal == 0)
         {
-        $sql = "select p.Ssn, p.Pref_date from Patient as p, appointment as a, dose as d
-        where a.P_Ssn = $Ssn and p.Ssn = $Ssn and a.Tracking_no = d.Tracking_no and d.status = \"reserved\" 
-        and a.date < $date";
-        $result=$db->query($sql);
-        if($result && $result->num_rows == 0)
+          $sql = "select p.Ssn, p.Pref_date from Patient as p, appointment as a, dose as d
+            where a.P_Ssn = $Ssn and p.Ssn = $Ssn and a.Tracking_no = d.Tracking_no and d.status = \"reserved\"";
+          $result=$db->query($sql);
+          if($result && $result->num_rows == 0)
           {
-            echo "You have likely already received the vaccine";
+            echo '<div class="error">We couldn\'t find your appointment.</div>';
           }
           else {
             #Trigger handles appointment cancelation and making the dose available
-            
-    
             $patient = $result->fetch_assoc();
             $Ssn = $patient['Ssn'];
             $DesiredDate = $patient['Pref_date'];
         
+            deletePatient($db, $Ssn);
             scheduleWaitlisted($db, $DesiredDate);
-            deleteAppt($db, $Ssn);
+            echo '<div class="success">We removed your appointment on ', $DesiredDate, '</div>';
           }
+        }
+        else{
+          echo '<div class="error">You were not found in our system.</div>'; 
+        }
       }
-      else{
-        echo 'You were not found in our system.'; 
-      }
-
-        
-            
-          
-      }
-     
-
-
-
-    ?>
+      
+      echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">"; ?>
+      <div class="form-grid">
+        <label>Enter your SSN: </label><input type="number" name="ssn"/>
+      </div>
+      <input type="submit">
+    </div>
   </body>
 </html>
 

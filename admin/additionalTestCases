@@ -5,7 +5,7 @@ insert into dose(Tracking_no, Status) values (104, "available")
 
 insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
 		 values (222356782, 'Michael Norman', 22, 
-		'1', '4953456712' '4-21-2021')";
+		'1', '4953456712' '4-30-2021')";
 
 --Assuming there are no more doses in the system, he would be put on waitlist.
 --Check waitlisted patients list

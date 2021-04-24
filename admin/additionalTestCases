@@ -1,30 +1,31 @@
 
 --Doses available, but patient cannot come in before expiration
-insert into batch(Manufacturer, Exp_date) values ('J&J', '4-28-2021')
-insert into dose(Tracking_no, Status) values (104, "available")
+insert into batch(Batch_no, Manufacturer, Exp_date) values (1, 'J&J', '2021-4-28')
+insert into dose(Batch_no, Tracking_no, Status) values (1, 104, "available")
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlist) 
 		 values (222356782, 'Michael Norman', 22, 
 		'1', '4953456712' '4-30-2021')";
+
 
 --Assuming there are no more doses in the system, he would be put on waitlist.
 --Check waitlisted patients list
 
 --Cancelation policy 1.  Assume only one dose available
-insert into batch(Manufacturer, Exp_date) values ('Pfizer', '7-31-2021')
-insert into dose(Tracking_no, Status) values (105, "available")
+insert into batch(Batch_no, Manufacturer, Exp_date) values (5, 'Pfizer', '7-31-2021')
+insert into dose(Batch_no, Tracking_no, Status) values (5, 105, "available")
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
 		 values (243456734, 'Eric Ryder', 35, 
-		'1', '6145673452' '7-26-2021')";
+		 1, '6145673452' '7-26-2021', False)";
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
 		 values (24515521, 'Erica Brown', 28, 
-		'1', '6145672341' '7-27-2021')";
+		 1, '6145672341' '7-27-2021', True)";
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
+insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
 		 values (245123789, 'Tyler Amadi', 34, 
-		'1', '6143235875' '7-28-2021')";
+		 1, '6143235875' '7-28-2021', True)";
 
 --Eric gets the appointments
 --List scheduled patients

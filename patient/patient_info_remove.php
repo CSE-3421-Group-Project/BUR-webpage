@@ -36,36 +36,54 @@
         return $conn;
       }
 
-      function findAvailableDose($db)
+      function findAvailableDose($date, $db)
       {
-        $dosesql = "select tracking_no from dose where status = \"available\"";
-        $result=$db->query($dosesql);
-        if ($result) {
+        try {
+          $dosesql = $db->prepare("SELECT tracking_no FROM dose, batch WHERE status = \"available\" AND dose.Batch_no = batch.Batch_no AND ? < Exp_date LIMIT 1");
+          $dosesql->bind_param("s", $date);
+          $dosesql->execute();
+          $result = $dosesql->get_result();
           if ($result->num_rows >0) 
           {
-              $selectedDose = $row['tracking_no'];
+            $row = $result->fetch_assoc();
+            return $row['tracking_no'];
           }
+        } catch (\Throwable $e) {
+          throw $e;
         }
-        return $selectedDose;
+
+        return null;
       }
 
-      function scheduleWaitlisted($db, $DesiredDate)
+      function scheduleWaitlisted($db)
       {
-        $findPatient = "select * from patient where 
-        and waitlist = 1 order by age and group by priority";
-        $result=$db->query($findPatient);
-        if ($result) {
-          if ($result->num_rows >0) 
-          {
-              $waitlistedPatient = $row['Ssn'];
-              $dose = findAvailableDose($db);
-              $sqlAppt = "Insert into appointment (P_Ssn, Tracking_no, Date) values ($waitlistedPatient, $dose, '$DesiredDate')";
-		          $result=$db->query($sqlAppt);
-		          if(!$result) 
-		          {
-			          echo $db->error;
-		          }
+        try {
+          $findPatient = "SELECT Ssn, Pref_date from patient where Waitlist = 1 order by Priority, Age DESC";
+          $result=$db->query($findPatient);
+          if ($result) {
+            if ($result->num_rows >0) 
+            {
+              while($row = $result->fetch_assoc()) {
+                $waitlistedPatient = $row['Ssn'];
+                $dose = findAvailableDose($row['Pref_date'], $db);
+                if($dose != null) {
+                  $sqlAppt = $db->prepare("INSERT INTO appointment (P_Ssn, Tracking_no, Date) VALUES (?, ?, ?)");
+                  $sqlAppt->bind_param("iis", $waitlistedPatient, $dose, $row['Pref_date']);
+                  $sqlAppt->execute();
+
+                  $reserveDose = $db->prepare("UPDATE dose SET Status = 'reserved' WHERE Tracking_no = ?");
+                  $reserveDose->bind_param("i", $dose);
+                  $reserveDose->execute();
+
+                  $takeOffWaitlist = $db->prepare("UPDATE patient SET Waitlist = FALSE WHERE Ssn = ?");
+                  $takeOffWaitlist->bind_param("i", $waitlistedPatient);
+                  $takeOffWaitlist->execute();
+                }
+              }
+            }
           }
+        } catch (\Throwable $e) {
+          throw $e;
         }
       }
 
@@ -112,7 +130,7 @@
             $DesiredDate = $patient['Pref_date'];
         
             deletePatient($db, $Ssn);
-            scheduleWaitlisted($db, $DesiredDate);
+            scheduleWaitlisted($db);
             echo '<div class="success">We removed your appointment on ', $DesiredDate, '</div>';
           }
         }

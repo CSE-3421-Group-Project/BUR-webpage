@@ -1,102 +1,173 @@
 
---Doses available, but patient cannot come in before expiration
-insert into batch(Batch_no, Manufacturer, Exp_date) values (1, 'J&J', '2021-4-28')
-insert into dose(Batch_no, Tracking_no, Status) values (1, 104, "available")
+--Test Case 1: Dose available, but patient cannot come in before expiration
+--Insert a batch of J&J vaccine with batch# = 1 and expiration date of 4-28-2021. This batch will have a single dose with dose# = 1.
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlist) 
-		 values (222356782, 'Michael Norman', 22, 
-		'1', '4953456712' '4-30-2021')";
 
+--Insert patient Michael Norman with the following information:
+--Ssn: 222356782
+--Name: Michael Norman
+--Age: 22 
+--Priority: 1
+--Phone: 4953456712 
+--Pref_Date: 4-29-2021
 
 --Assuming there are no more doses in the system, he would be put on waitlist.
---Check waitlisted patients list
+--Check waitlisted patients list and Michael Norman should be there.  Assuming there is no one else in the database, he would be the 
+only one listed in the waitlisted patient list.  There would also be no one else in the scheduled list.
+--Check inventory and the J&J vaccine should be present.
+--Dose status should list the dose number, a blank name field, and the status should be available.
 
---Cancelation policy 1.  Assume only one dose available
-insert into batch(Batch_no, Manufacturer, Exp_date) values (5, 'Pfizer', '7-31-2021')
-insert into dose(Batch_no, Tracking_no, Status) values (5, 105, "available")
+--Test Case 2: Cancelation policy for those in the same priority group.  Assume only one dose available.
+--Add batch from Pfizer with Batch# = 5 and an expiration date of 7-31-2021. This batch will have a single dose with dose# = 105.
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
-		 values (243456734, 'Eric Ryder', 35, 
-		 1, '6145673452' '7-26-2021', False)";
+--Add Eric Ryder, Erica Brown, and Tyler Amadi in the following order with the associated information.
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
-		 values (24515521, 'Erica Brown', 28, 
-		 1, '6145672341' '7-27-2021', True)";
+--Insert patient Eric Ryder following information:
+--Ssn: 243456734
+--Name: Eric Ryder
+--Age: 35
+--Priority: 1
+--Phone: 6145673452
+--Pref_Date: 7-26-2021	 
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date, Waitlisted) 
-		 values (245123789, 'Tyler Amadi', 34, 
-		 1, '6143235875' '7-28-2021', True)";
-
---Eric gets the appointments
---List scheduled patients
---Eric cancels his appointment
---List scheduled patients
---Tyler should get the appointment based on age.
---List scheduled patients
+--Insert patient Erica Brown with the following information:
+--Ssn: 24515521
+--Name: Erica Brown
+--Age: 28
+--Priority: 1
+--Phone: 6145672341
+--Pref_Date: 7-27-2021 
 
 
---Cancelation Policy 2.  Assume there is 1 dose of Moderna available.
-insert into batch(Manufacturer, Exp_date) values ('Moderna', '8-25-2021')
-insert into dose(Tracking_no, Status) values (106, "available")
+--Insert patient Tyler Amadi with the following information:
+--Ssn: 245123789
+--Name: Tyler Amadi
+--Age: 34
+--Priority: 1
+--Phone: 6143235875
+--Pref_Date: 7-28-2021
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (666688889, 'Alenna Norman', 17, 
-		'1', '8886784561' '8-15-2021')";
+--Expected behavior:
+--Eric gets the appointment for the Pfizer dose.
+--If we list the scheduled patients, we should see Eric Ryder only. The dose status should show Eric Ryder associated with that
+--Pfizer dose.  The status should be reserved. The inventory should list this dose and it should be marked as reserved.
+--If we check the waitisted list, both Erica and Tyler will be on said list.
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (777776689, 'Alice Hardy', 18, 
-		'1', '6157895647' '8-16-2021')";
+--Eric cancels his appointment.  Based on age, Tyler should get the dose.
+--If we list the scheduled patients list, Tyler should be present.  Erica Brown should still be on wait list still.
+--If we check the dose status page, it should be still reserved, but Tyler's name should be listed.
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (333322221, 'Chris Hardy', 42, 
-		'2', '9087654351' '8-17-2021')";
---Alenna gets the appointment
+
+--Test Case 3: Cancelation policy 2.  
+
+--Assume there is one dose of Moderna available. The dose # = 106 and Batch # = 6. The expiration date is 8-25-2021.
+
+--Insert the patients in the following order:
+		
+--Insert patient Alenna Norman with the following information:
+--Ssn: 666688889
+--Name: Alenna Norman
+--Age: 17
+--Priority: 1
+--Phone: 8886784561
+--Pref_Date: 8-15-2021
+
+		
+--Insert patient Alice Hardy with the following information:
+--Ssn: 777776689
+--Name: Alice Hardy
+--Age: 18
+--Priority: 1
+--Phone: 6157895647
+--Pref_Date: 8-16-2021
+
+--Insert patient Chris Hardy with the following information:
+--Ssn: 777778876
+--Name: Chris Hardy
+--Age: 42
+--Priority: 2
+--Phone: 6154672341
+--Pref_Date: 8-17-2021
+		
+--Alenna gets the appointment as she was the first patient present.
+--List scheduled patients and Alice should be listed. Chris and Alice should be on the waitlist.
+--Check the dose status page and Alenna should be listed and the status should be reserved.
+--Check the inventory page and the dose should be listed as reserved.
 --Alenna cancels her appointment after both Alice and Chris are in the system
 --Chris gets the appointment due to a higher priority.
---List scheduled patients
+--List scheduled patients and Chris should be listed. Alice should still be on waitlist.
+--Check the dose status and Chris should be listed and the status should still be reserved.  
 
 
---No vaccines available example.
+--Test Case 4: No doses available and patient with dose will not cancel.
+--Insert a batch of Pfizer with batch # = 7.  The batch will contain a single dose with dose # = 107. The expiration date is 8-15-2021.
+--Insert a batch from Modern with batch # = 8.  The batch will contain two doses with dose # = 108 and 109.  The expiration date is 8-15-2021.
 
-insert into batch(Manufacturer, Exp_date) values ('Pfizer', '8-15-2021')
-insert into dose(Tracking_no, Status) values (107, "available")
+--Insert the following patients:
+		
+--Insert patient Mary Commons with the following information:
+--Ssn: 676767432
+--Name: Mary Commons
+--Age: 70
+--Priority: 3
+--Phone: 5692353451
+--Pref_Date: 8-15-2021
+		
+--Insert patient Brian Morrison with the following information.
+--Ssn: 908764561
+--Name: Brian Morrison
+--Age: 16
+--Priority: 1
+--Phone: 892457391
+--Pref_Date: 8-15-2021
 
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (676767432, 'Mary Commons', 70, 
-		'3', '5692353451' '8-15-2021')";
-
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (908764561, 'Brian Morrison', 16, 
-		'1', '892457391' '8-16-2021')";
 --Mary Commons gets the appointment.  She will not cancel.
---Brian wants an appointment, but is put on the waiting list.
---Check scheduled and waiting lists
-
---Waiting Patient gets appointment example
-
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (896789426, 'Akira Howard', 24, 
-		'1', '9081236578' '9-26-2021')";
-
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (567124989, 'Lisa Smith', 45, 
-		'2', '6145698756' '10-27-2021')";
-
-insert into batch(Manufacturer, Exp_date) values ('Pfizer', '9-29-2021')
-insert into dose(Tracking_no, Status) values (108, "available")
-
---Both are put on waitlist.
---Lisa cannot come in before expiration Exp_date
---Akira gets appointment
---Check scheduled list.
---Check dose status list
+--Brian wants an appointment, but is put on the waiting list due to the expiration date.
+--Check scheduled and waiting lists.  Mary should be on the scheduled list and dose status page should show her name with the dose being marked as reserved.
+--The other doses of Moderna will be listed as available and without a name.
+--Check the waiting list.  Brian should be listed.
 
 
---List Batches
-insert into batch(Manufacturer, Exp_date) values ('J&J', '10-29-2021')
-insert into batch(Manufacturer, Exp_date) values ('J&J', '10-30-2021')
+--New dose from Moderna comes into the system. This batch contains 2 doses with dose # = 110 and 111.  The expiration date is 8-25-2021.
 
---Both batches should be listed.
+--Brian should no longer be on the waiting list. He should be scheduled for an appointment with one of the newly available doses.
+--The scheduled patient list should show Mary and Brian now.  The waitlist should be empty. The dose status page will
+--list Brian and Mary and the status should be reserved.  The other Moderna should have no name associated with them and the status should be available.
+--Check the inventory page.  The Moderna and Pfizer doses for Brian and Mary should be considered as reserved.  Three doses of Moderna should be marked as available.
+
+
+--Test Case 5: Waitlist all Patients
+
+		
+--Insert patient Akira Howard with the following information:
+--Ssn: 896789426
+--Name: Akira Howard
+--Age: 24
+--Priority: 1
+--Phone: 9081236578
+--Pref_Date: 9-26-2021
+		
+--Insert patient Olive Espinosa with the following information:
+--Ssn: 567124989
+--Name: Olive Espinosa
+--Age: 28
+--Priority: 2
+--Phone: 6145698756
+--Pref_Date: 10-27-2021
+
+--Insert batch from Pfizer with a batch # = 108.  The dose# is 112.  The expiration date is 9-25-2021.
+
+--Both are put on waitlist.  Check waitlist on admin page.
+--Scheduled table should be blank.
+--Check dose status list.  It should show the dose as available, but there are no names listed.
+--Inventory page should list the dose as available.
+
+
+Test Case 6: List Batches only
+--Two batches of J&J are added.  One batch has a batch# = 109 with a single dose (dose# = 113) and an expiration date of 10-29-2021.
+--The second batch will have a batch# = 110 with 10 doses with dose# = 114-124 and the expiration of all doses is 10-30-2021.
+
+--All doses listed on dose status page will be available with no name. On the inventory page, all doses will be listed in the same row and will be marked as available.
 
 --Used Doses
 insert into batch(Manufacturer, Exp_date) values ('J&J', '9-29-2021')

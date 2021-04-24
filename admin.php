@@ -41,6 +41,10 @@
           <h2>Dose Statuses</h2>
           <p>Generate list of doses and the patient assigned to them.</p>
         </div>
+        <div class="action-card" onclick="redirect('admin/update-appointment.php')">
+          <h2>Update an appointment</h2>
+          <p>Confirm that a patient received their dose.</p>
+        </div>
       </div>
     </div>
   </body>

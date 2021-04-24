@@ -60,7 +60,12 @@ EOD;
         $db = connectToDatabase();
         
         $update_dose = "UPDATE dose SET status='used' WHERE Tracking_no=".$dose;
-        echo "<div class=\"success\">The appointment was successfully updated!</div>";
+        if ($db->query($update_dose)){
+          echo "<div class=\"success\">The appointment was successfully updated and the dose has been marked used!</div>";
+        } else {
+          echo "<div class=\"error\">The appointment was not updated!</div>";
+        }
+
       }
 
 ?>    

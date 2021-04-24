@@ -38,8 +38,7 @@ EOD;
         }
         return null;
       }
-
-      echo "<form method=\"post\" class=\"form-wrapper\">";
+      echo "<form method=\"post\" action=\"", $_SERVER['PHP_SELF'], "\" class=\"form-wrapper\">";
       echo  "<select name=\"patient_select\" id=\"patient_select\">";
       echo "<option value=\"\" selected>None</option>";
       $db = connectToDatabase();
@@ -51,14 +50,14 @@ EOD;
           echo "</option>";
         }
       }
-
+?>
+<?php
       echo "</select>";
       echo "<input type=\"submit\" value=\"Submit\" />";
       echo "</form>";
-      if(array_key_exists('manufacturer', $_POST) && $_POST['patient_select'] ) {
+      if(array_key_exists('patient_select', $_POST) && $_POST['patient_select'] ) {
         $dose = $_POST['patient_select'];
         $db = connectToDatabase();
-        
         $update_dose = "UPDATE dose SET status='used' WHERE Tracking_no=".$dose;
         if ($db->query($update_dose)){
           echo "<div class=\"success\">The appointment was successfully updated and the dose has been marked used!</div>";

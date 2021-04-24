@@ -58,7 +58,13 @@
       function scheduleWaitlisted($db)
       {
         try {
-          $findPatient = "SELECT Ssn, Pref_date from patient where Waitlist = 1 order by Priority, Age DESC";
+          $findPatient = <<<EOD
+                  SELECT Ssn, Pref_date 
+                  FROM Patient
+                  WHERE Waitlist=1
+                  ORDER BY Priority DESC,
+                            Age DESC
+EOD;
           $result=$db->query($findPatient);
           if ($result) {
             if ($result->num_rows >0) 

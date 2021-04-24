@@ -170,14 +170,19 @@ Test Case 6: List Batches only
 --All doses listed on dose status page will be available with no name. On the inventory page, all doses will be listed in the same row and will be marked as available.
 
 --Used Doses
-insert into batch(Manufacturer, Exp_date) values ('J&J', '9-29-2021')
-insert into patient (Ssn, Name, Age, Priority, Phone, Pref_Date) 
-		 values (896789445, 'Samuel Brown', 21, 
-		'1', '9081278984' '9-26-2021')";
+--A J&J batch was added to the system (batch# = 111, with expiration date 9-29-2021. There is a single dose with dose#=125)
+--Insert the following patient:
+--SSN: 123456789
+--Name: John Smith
+--Age: 25
+--Priority: 1
+--Phone:6157896715
+--Pref_Date = 9-26-2021
 
---Samuel gets an appointment.
---Check if dose is Used
---Check list of vaccinated.
+--John gets an appointment.
+--John is vaccinated
+--Dose should be marked as used.
+--John should appear on vaccinated list.
 
 
 
